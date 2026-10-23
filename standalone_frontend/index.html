@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sentry — AI Issue Reporting &amp; Resolution System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+</head>
+<body>
+
+  <!-- ===== Nav ===== -->
+  <header class="navbar">
+    <div class="container navbar__inner">
+      <div class="brand">
+        <span class="brand__icon">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/></svg>
+        </span>
+        <span class="brand__name">Sentry</span>
+        <span class="brand__tag">campus build</span>
+      </div>
+
+      <nav class="navlinks">
+        <a href="#pipelines">How it works</a>
+        <a href="#modules">Modules</a>
+        <a href="campus-portal.html" style="color:var(--amber);">Campus Portal</a>
+        <a href="admin-portal.html" style="color:var(--cyan);">Admin Console</a>
+      </nav>
+
+
+      <div class="navactions">
+        <a href="admin-portal.html" class="btn btn--ghost">Admin login</a>
+        <a href="campus-portal.html" class="btn btn--amber">Report an issue</a>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ===== Hero ===== -->
+  <section class="hero container">
+    <div class="hero__grid">
+      <div>
+        <div class="eyebrow eyebrow--cyan">
+          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.8L20 11l-6.1 2.2L12 19l-1.9-5.8L4 11l6.1-2.2L12 3z"/></svg>
+          Autonomous Facility Intelligence &mdash; Smart Campus Platform
+        </div>
+
+        <h1 class="hero__title">
+          Every issue seen.<br />
+          Every fix <span class="accent-amber">verified.</span>
+        </h1>
+        <p class="hero__desc">
+          One platform for large campuses that closes the loop on facility
+          management — a CNN classifies reported problems from a single
+          photo, and a computer-vision pipeline confirms scheduled
+          maintenance actually happened, without anyone filing a follow-up.
+        </p>
+        <div class="hero__ctas">
+          <a href="campus-portal.html" class="btn btn--amber btn--lg">
+            Report an issue
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </a>
+          <a href="admin-portal.html" class="btn btn--outline btn--lg">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+            Open admin dashboard
+          </a>
+        </div>
+
+      </div>
+
+      <!-- Pipeline tracker (signature element, animated via JS) -->
+      <div class="tracker">
+        <div class="tracker__head">
+          <span>Resolution lifecycle</span>
+          <span class="tracker__live">
+            <svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg>
+            live tracking
+          </span>
+        </div>
+        <div class="tracker__track" id="tracker">
+          <div class="tracker__line"></div>
+          <div class="tracker__fill" id="trackerFill"></div>
+          <div class="tracker__stage" data-stage="0">
+            <span class="tracker__dot"></span>
+            <span class="tracker__label">Reported</span>
+          </div>
+          <div class="tracker__stage" data-stage="1">
+            <span class="tracker__dot"></span>
+            <span class="tracker__label">In Progress</span>
+          </div>
+          <div class="tracker__stage" data-stage="2">
+            <span class="tracker__dot"></span>
+            <span class="tracker__label">Resolved</span>
+          </div>
+          <div class="tracker__stage" data-stage="3">
+            <span class="tracker__dot"></span>
+            <span class="tracker__label">Closed</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Two pipelines ===== -->
+  <section id="pipelines" class="section container">
+    <div class="section__head">
+      <span class="kicker">01 — How it works</span>
+      <h2>Two pipelines, one dashboard</h2>
+    </div>
+
+    <div class="grid-2">
+      <div class="card card--amber">
+        <div class="card__icon card__icon--amber">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        </div>
+        <span class="card__eyebrow card__eyebrow--amber">Reactive</span>
+        <h3>User-reported issues</h3>
+        <p>A campus member submits a photo, a short description, and a
+          location. A CNN fine-tuned on infrastructure images predicts the
+          category in seconds, routes it to the right team, and starts the
+          resolution clock.</p>
+        <div class="chips">
+          <span class="chip">ResNet50 / MobileNetV2</span>
+          <span class="chip">5-class transfer learning</span>
+          <span class="chip">Auto-routing</span>
+        </div>
+      </div>
+
+      <div class="card card--cyan">
+        <div class="card__icon card__icon--cyan">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
+        </div>
+        <span class="card__eyebrow card__eyebrow--cyan">Proactive</span>
+        <h3>Camera-based verification</h3>
+        <p>A morning and evening image pair from the same fixed point is
+          compared with the Structural Similarity Index. A score below
+          threshold confirms the task was actually done — no self-reporting
+          required.</p>
+        <div class="chips">
+          <span class="chip">OpenCV</span>
+          <span class="chip">SSIM scoring</span>
+          <span class="chip">Scheduled capture</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Classification classes ===== -->
+  <section class="container">
+    <div class="panel-box">
+      <span class="kicker">Classification classes</span>
+      <div class="cats">
+        <div class="cats__item">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+          Electrical
+        </div>
+        <div class="cats__item">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2s7 7.5 7 12a7 7 0 0 1-14 0c0-4.5 7-12 7-12z"/></svg>
+          Plumbing
+        </div>
+        <div class="cats__item">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+          Structural
+        </div>
+        <div class="cats__item">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.8L20 11l-6.1 2.2L12 19l-1.9-5.8L4 11l6.1-2.2L12 3z"/></svg>
+          Cleanliness
+        </div>
+        <div class="cats__item">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L2 19v3h3l7.3-7.3a4 4 0 0 0 5.4-5.4l-2.8 2.8-2-2 2.8-2.8z"/></svg>
+          Equipment
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== System modules ===== -->
+  <section id="modules" class="section container">
+    <div class="section__head">
+      <span class="kicker">02 — System modules</span>
+      <h2>Four modules, cleanly separated</h2>
+    </div>
+
+    <div class="grid-4">
+      <div class="module">
+        <span class="module__num">01</span>
+        <svg class="module__icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 3 6v6c0 5 4 9 9 10 5-1 9-5 9-10V6l-9-4z"/></svg>
+        <h4>Auth &amp; roles</h4>
+        <p>JWT-secured login separating campus users from administrators, with every submission mapped to a verified identity.</p>
+      </div>
+      <div class="module">
+        <span class="module__num">02</span>
+        <svg class="module__icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        <h4>Maintenance verification</h4>
+        <p>Scheduled image capture, SSIM comparison, and automatic compliance logging on the admin dashboard.</p>
+      </div>
+      <div class="module">
+        <span class="module__num">03</span>
+        <svg class="module__icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        <h4>Issue classification</h4>
+        <p>CNN-based photo classification across Electrical, Plumbing, Structural, Cleanliness, and Equipment Failure.</p>
+      </div>
+      <div class="module">
+        <span class="module__num">04</span>
+        <svg class="module__icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+        <h4>Task assignment &amp; analytics</h4>
+        <p>Category- and severity-aware routing, plus live trends on compliance rate, resolution time, and hotspots.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Portals ===== -->
+  <section id="portals" class="section container section--bordered">
+    <div class="section__head">
+      <span class="kicker">03 — Access</span>
+      <h2>Pick your portal</h2>
+    </div>
+
+
+    <div class="grid-2">
+      <div class="portalcard portalcard--amber">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        <h3>Campus portal</h3>
+        <p>Report a problem with a photo, track its status in real time, and get notified the moment it moves to the next stage.</p>
+        <a href="campus-portal.html" class="btn btn--amber">
+          Enter campus portal
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+      </div>
+      <div class="portalcard portalcard--cyan">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+        <h3>Admin dashboard</h3>
+        <p>Review AI classifications, verify maintenance compliance, manage teams, and monitor analytics from one console.</p>
+        <a href="admin-portal.html" class="btn btn--outline-cyan">
+          Enter admin dashboard
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Footer ===== -->
+  <footer class="footer">
+    <div class="container footer__inner">
+      <span>Sentry — AI-Powered Issue Reporting &amp; Resolution System</span>
+      <span>JSPM's Rajarshi Shahu College of Engineering, Pune</span>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

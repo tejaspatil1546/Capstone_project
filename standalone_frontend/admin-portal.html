@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard — Sentry Facility Management &amp; CV Verification</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+</head>
+<body>
+
+  <!-- ===== Navigation Bar ===== -->
+  <header class="navbar">
+    <div class="container navbar__inner">
+      <div class="brand">
+        <a href="index.html" style="display:flex;align-items:center;gap:10px;">
+          <span class="brand__icon">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/></svg>
+          </span>
+          <span class="brand__name">Sentry</span>
+        </a>
+        <span class="brand__tag" style="color:var(--cyan);border-color:rgba(79,209,197,0.4);">Admin Console</span>
+      </div>
+
+      <div class="portal-nav">
+        <!-- Admin Logged In State -->
+        <div id="adminNavLoggedIn" style="display:flex;align-items:center;gap:10px;">
+          <div class="user-badge">
+            <span class="user-badge__dot" style="background:var(--amber);box-shadow:0 0 8px rgba(240,162,2,0.8);"></span>
+            <span id="adminHeaderName">Dr. Neerajkumar Sathawane (Campus Admin)</span>
+          </div>
+          <button class="btn btn--ghost" style="padding:6px 12px;font-size:12px;" onclick="handleAdminLogout()">Secure Logout</button>
+        </div>
+
+        <!-- Admin Logged Out State -->
+        <div id="adminNavLoggedOut" style="display:none;align-items:center;gap:10px;">
+          <span class="chip" style="font-size:10px;color:var(--amber);border-color:rgba(240,162,2,0.4);">🔒 Security Locked</span>
+        </div>
+
+        <a href="campus-portal.html" class="btn btn--ghost" style="padding:6px 12px;font-size:12px;">Switch to Campus Portal</a>
+        <a href="index.html" class="btn btn--outline" style="padding:6px 12px;font-size:12px;">Home</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ========================================== -->
+  <!-- 1. ADMIN SECURITY GATEWAY (LOGIN PROMPT)   -->
+  <!-- ========================================== -->
+  <div id="adminLoginGateway" class="container section" style="display:none;min-height:70vh;align-items:center;justify-content:center;">
+    <div class="card" style="max-width:440px;width:100%;margin:40px auto;padding:36px;border:1px solid rgba(240,162,2,0.4);box-shadow:0 16px 48px rgba(0,0,0,0.8);background:var(--panel);">
+      
+      <!-- Security Header -->
+      <div style="text-align:center;margin-bottom:24px;">
+        <div style="width:56px;height:56px;margin:0 auto 16px;border-radius:12px;background:rgba(240,162,2,0.15);border:1px solid rgba(240,162,2,0.4);display:flex;align-items:center;justify-content:center;color:var(--amber);">
+          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </div>
+        <span class="eyebrow eyebrow--cyan" style="font-size:10px;margin-bottom:8px;">Restricted Access // RBAC</span>
+        <h2 style="font-family:var(--font-display);font-size:24px;font-weight:700;margin-top:6px;">Administrator Gateway</h2>
+        <p style="font-size:13px;color:var(--muted);margin-top:6px;">
+          Facility Operations, Camera Maintenance Verification, and Complaint Oversight require authorized administrator credentials.
+        </p>
+      </div>
+
+      <!-- Error feedback -->
+      <div id="adminLoginError" style="display:none;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);color:#ef4444;padding:10px 14px;border-radius:6px;font-size:12px;margin-bottom:16px;"></div>
+
+      <!-- Login Form -->
+      <form id="adminLoginForm" onsubmit="submitAdminLogin(event)">
+        <div class="form-group">
+          <label class="form-label">Administrator ID / College Email</label>
+          <input type="email" id="adminEmailInput" class="form-input" value="admin@campus.edu" required />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Security Password</label>
+          <input type="password" id="adminPasswordInput" class="form-input" placeholder="Enter admin security password" value="admin123" required />
+        </div>
+
+        <button type="submit" id="adminLoginBtn" class="btn btn--amber btn--lg" style="width:100%;justify-content:center;margin-top:10px;">
+          <span>Authenticate &amp; Enter Console</span>
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </button>
+      </form>
+
+      <!-- Default credentials hint for academic evaluation -->
+      <div style="margin-top:20px;padding:12px;background:var(--panel-2);border-radius:6px;border:1px solid var(--line);font-size:11px;color:var(--muted);display:flex;justify-content:space-between;align-items:center;">
+        <span>Default Admin: <b style="color:var(--paper);">admin@campus.edu</b></span>
+        <span>Key: <b style="color:var(--paper);">admin123</b></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- 2. MAIN ADMIN CONSOLE (AUTHENTICATED)      -->
+  <!-- ========================================== -->
+  <main id="adminDashboardContent" class="container section">
+
+    <!-- KPI Metrics Row -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-card__label">Total Issues Logged</div>
+        <div class="kpi-card__value" id="kpiTotal">0</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-card__label">Active / In Progress</div>
+        <div class="kpi-card__value" id="kpiActive" style="color:var(--amber);">0</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-card__label">Maintenance Compliance</div>
+        <div class="kpi-card__value" id="kpiCompliance" style="color:var(--cyan);">0%</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-card__label">Avg. Resolution Time</div>
+        <div class="kpi-card__value" id="kpiAvgTime">0h</div>
+      </div>
+    </div>
+
+    <!-- Admin Tabs -->
+    <nav class="tab-nav">
+      <button class="tab-btn is-active" onclick="switchAdminTab('verification', this)">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
+        Proactive SSIM Verification
+      </button>
+      <button class="tab-btn" onclick="switchAdminTab('issues', this)">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+        Active Issues &amp; Task Assignment
+      </button>
+      <button class="tab-btn" onclick="switchAdminTab('analytics', this)">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        Real-Time Analytics &amp; Hotspots
+      </button>
+    </nav>
+
+    <!-- TAB 1: SSIM Computer Vision Verification -->
+    <div id="admin-verification" class="tab-pane is-active">
+      <div class="card" style="padding:28px;margin-bottom:28px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;margin-bottom:20px;">
+          <div>
+            <span class="kicker">Proactive Maintenance Verification Pipeline</span>
+            <h2 style="font-family:var(--font-display);font-size:22px;margin-top:4px;">Automated Camera Image Pair Analysis</h2>
+          </div>
+          
+          <div style="display:flex;align-items:center;gap:12px;">
+            <label class="form-label" style="margin-bottom:0;">Select Zone:</label>
+            <select id="zoneSelector" class="form-select" style="width:280px;" onchange="handleZoneChange()">
+              <option value="zone-cafe-01">Main Cafeteria (Zone 1) - Post-Clean</option>
+              <option value="zone-court-04">Central Courtyard (Zone 4) - Unattended</option>
+            </select>
+            <button class="btn btn--amber" onclick="triggerSsimAnalysis()">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              Run SSIM Verification
+            </button>
+          </div>
+        </div>
+
+        <p style="font-size:13px;color:var(--muted);max-width:850px;line-height:1.5;">
+          Compares scheduled morning reference photographs with evening checkpoint images using OpenCV preprocessing, Gaussian blur filtering, and the Structural Similarity Index Measure (SSIM) to automatically verify whether daily maintenance took place without requiring manual physical inspection.
+        </p>
+
+        <!-- Visual Viewport -->
+        <div class="ssim-viewport">
+          <!-- Morning Frame -->
+          <div class="ssim-frame">
+            <div class="ssim-frame__head">
+              <span id="morningLabel">Morning Capture (08:00 AM)</span>
+              <span class="chip" style="font-size:9px;">Baseline</span>
+            </div>
+            <img id="ssimMorningImg" src="/uploads/cafeteria_morning.jpg" alt="Morning Capture" onerror="handleImgError(this, 'cafeteria_morning.jpg')" />
+          </div>
+
+          <!-- Evening Frame -->
+          <div class="ssim-frame">
+            <div class="ssim-frame__head">
+              <span id="eveningLabel">Evening Capture (18:00 PM)</span>
+              <span class="chip" style="font-size:9px;">Checkpoint</span>
+            </div>
+            <img id="ssimEveningImg" src="/uploads/cafeteria_evening.jpg" alt="Evening Capture" onerror="handleImgError(this, 'cafeteria_evening.jpg')" />
+          </div>
+
+          <!-- Heatmap Frame -->
+          <div class="ssim-frame" style="border-color:rgba(79,209,197,0.4);">
+            <div class="ssim-frame__head" style="background:rgba(79,209,197,0.1);">
+              <span style="color:var(--cyan);">Visual Difference Heatmap</span>
+              <span class="chip" style="font-size:9px;color:var(--cyan);border-color:var(--cyan);">CV Output</span>
+            </div>
+            <img id="ssimHeatmapImg" src="/uploads/cafeteria_evening.jpg" alt="Difference Heatmap" onerror="handleImgError(this, 'cafeteria_evening.jpg')" />
+          </div>
+        </div>
+
+        <!-- Verification Results Card -->
+        <div id="ssimResultCard" style="margin-top:24px;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;padding:20px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;">
+            <div>
+              <div style="font-family:var(--font-mono);font-size:11px;color:var(--muted);text-transform:uppercase;">SSIM Verification Verdict</div>
+              <div id="ssimVerdictBadge" style="font-family:var(--font-display);font-size:24px;font-weight:700;color:var(--cyan);margin-top:4px;">
+                COMPLIANCE CONFIRMED
+              </div>
+            </div>
+
+            <div style="display:flex;gap:24px;">
+              <div>
+                <div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);text-transform:uppercase;">SSIM Index</div>
+                <div id="ssimScoreVal" style="font-family:var(--font-mono);font-size:22px;font-weight:700;color:var(--paper);margin-top:2px;">0.8423</div>
+              </div>
+              <div>
+                <div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);text-transform:uppercase;">Scene Clean Delta</div>
+                <div id="ssimDeltaVal" style="font-family:var(--font-mono);font-size:22px;font-weight:700;color:var(--amber);margin-top:2px;">8.74%</div>
+              </div>
+              <div>
+                <div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);text-transform:uppercase;">Status Flag</div>
+                <div id="ssimLevelVal" style="font-family:var(--font-mono);font-size:14px;font-weight:600;color:var(--cyan);margin-top:6px;">Passed</div>
+              </div>
+            </div>
+          </div>
+
+          <div id="ssimStatusMsg" style="margin-top:14px;font-size:13px;color:var(--paper);border-top:1px solid var(--line);padding-top:12px;">
+            VERIFIED: Physical maintenance and cleaning confirmed by structural scene delta analysis.
+          </div>
+        </div>
+      </div>
+
+      <!-- Verification History Table -->
+      <div class="panel-box">
+        <h3 style="font-size:18px;margin-bottom:16px;">Historical Maintenance Compliance Logs</h3>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Log ID</th>
+                <th>Zone / Location</th>
+                <th>Date &amp; Scheduled Timings</th>
+                <th>SSIM Score</th>
+                <th>Delta %</th>
+                <th>Compliance Verdict</th>
+              </tr>
+            </thead>
+            <tbody id="verificationLogsTable">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: Active Issues & Smart Task Routing  -->
+    <div id="admin-issues" class="tab-pane">
+      <div class="panel-box" style="margin-bottom:20px;padding:18px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+          <input type="text" id="adminSearch" class="form-input" placeholder="Search issues by ID, Title, Location..." style="max-width:360px;" oninput="renderAdminIssues()" />
+          
+          <div style="display:flex;gap:10px;">
+            <select id="adminCatFilter" class="form-select" style="width:180px;" onchange="renderAdminIssues()">
+              <option value="All">All Categories</option>
+              <option value="Electrical">Electrical</option>
+              <option value="Plumbing">Plumbing</option>
+              <option value="Structural Damage">Structural Damage</option>
+              <option value="Cleanliness">Cleanliness</option>
+              <option value="Equipment Failure">Equipment Failure</option>
+            </select>
+
+            <select id="adminStatusFilter" class="form-select" style="width:160px;" onchange="renderAdminIssues()">
+              <option value="All">All Statuses</option>
+              <option value="Reported">Reported</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Resolved">Resolved</option>
+              <option value="Closed">Closed</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Ticket ID</th>
+              <th>Photo</th>
+              <th>Issue Title &amp; Location</th>
+              <th>Category (AI)</th>
+              <th>Urgency</th>
+              <th>Status</th>
+              <th>Assigned Department</th>
+              <th>Lifecycle Actions</th>
+            </tr>
+          </thead>
+          <tbody id="adminIssuesTable">
+            <!-- Dynamically populated -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB 3: Real-Time Analytics & Hotspots -->
+    <div id="admin-analytics" class="tab-pane">
+      <div class="grid-2" style="margin-bottom:24px;">
+        <!-- Category Breakdown -->
+        <div class="card">
+          <h3 style="font-size:18px;margin-bottom:16px;">Issues by Category</h3>
+          <div id="analyticsCatBreakdown" style="display:flex;flex-direction:column;gap:12px;">
+            <!-- Category bars -->
+          </div>
+        </div>
+
+        <!-- Campus Hotspots -->
+        <div class="card">
+          <h3 style="font-size:18px;margin-bottom:16px;">Campus Zone Hotspot Frequency</h3>
+          <div id="analyticsHotspots" style="display:flex;flex-direction:column;gap:12px;">
+            <!-- Hotspots -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Re-assign Modal -->
+  <div id="assignModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:2000;align-items:center;justify-content:center;">
+    <div class="card" style="width:100%;max-width:480px;background:var(--panel);">
+      <h3 style="font-size:18px;margin-bottom:12px;">Re-assign Task to Department</h3>
+      <div class="form-group">
+        <label class="form-label">Ticket</label>
+        <input type="text" id="modalTicketId" class="form-input" readonly />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Maintenance Department</label>
+        <select id="modalTeamSelect" class="form-select">
+          <option value="Electrical Maintenance Squad">Electrical Maintenance Squad (ext. 401)</option>
+          <option value="Plumbing & Drainage Division">Plumbing & Drainage Division (ext. 402)</option>
+          <option value="Civil Infrastructure & Works">Civil Infrastructure & Works (ext. 403)</option>
+          <option value="Sanitation & Campus Hygiene Services">Sanitation & Campus Hygiene Services (ext. 404)</option>
+          <option value="Lab & Smart Campus IT Facilities">Lab & Smart Campus IT Facilities (ext. 405)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Priority Override</label>
+        <select id="modalUrgencySelect" class="form-select">
+          <option value="Low">Low</option>
+          <option value="Medium">Medium</option>
+          <option value="High">High</option>
+          <option value="Critical">Critical</option>
+        </select>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:20px;">
+        <button class="btn btn--ghost" onclick="closeAssignModal()">Cancel</button>
+        <button class="btn btn--amber" onclick="saveAssignment()">Save Assignment</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      initAdminAuth();
+    });
+  </script>
+</body>
+</html>

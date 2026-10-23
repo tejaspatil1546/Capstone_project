@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Campus Portal — Sentry Issue Reporting &amp; Tracking</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+</head>
+<body>
+
+  <!-- ===== Navigation Bar ===== -->
+  <header class="navbar">
+    <div class="container navbar__inner">
+      <div class="brand">
+        <a href="index.html" style="display:flex;align-items:center;gap:10px;">
+          <span class="brand__icon">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/></svg>
+          </span>
+          <span class="brand__name">Sentry</span>
+        </a>
+        <span class="brand__tag" style="color:var(--amber);border-color:rgba(240,162,2,0.4);">Campus User Portal</span>
+      </div>
+
+      <div class="portal-nav">
+        <!-- Dynamic User Badge & Actions -->
+        <div id="authNavLoggedIn" style="display:flex;align-items:center;gap:10px;">
+          <div class="user-badge">
+            <span class="user-badge__dot"></span>
+            <span id="headerUserName">Tejas Patil (Student)</span>
+          </div>
+          <button class="btn btn--ghost" style="padding:6px 12px;font-size:12px;" onclick="handleUserLogout()">Logout</button>
+        </div>
+
+        <div id="authNavLoggedOut" style="display:none;align-items:center;gap:10px;">
+          <div class="user-badge" style="border-color:var(--line);color:var(--muted);">
+            <span class="user-badge__dot" style="background:var(--muted);box-shadow:none;"></span>
+            <span>Guest (Not Logged In)</span>
+          </div>
+          <button class="btn btn--amber" style="padding:6px 14px;font-size:12px;" onclick="openAuthModal('login')">Login / Register</button>
+        </div>
+
+        <a href="admin-portal.html" class="btn btn--ghost" style="padding:6px 12px;font-size:12px;">Admin Console</a>
+        <a href="index.html" class="btn btn--outline" style="padding:6px 12px;font-size:12px;">Home</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== Main Container ===== -->
+  <main class="container section">
+    
+    <!-- Portal Header & Tabs -->
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:24px;flex-wrap:wrap;gap:16px;">
+      <div>
+        <span class="kicker">Campus Individual Portal</span>
+        <h1 style="font-family:var(--font-display);font-size:28px;margin-top:4px;">Report &amp; Track Infrastructure Issues</h1>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn--amber" onclick="switchCampusTab('report')">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+          Report New Issue
+        </button>
+        <button class="btn btn--outline" onclick="switchCampusTab('track')">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          My Submissions (<span id="myIssueCount">0</span>)
+        </button>
+      </div>
+    </div>
+
+    <!-- Login Required Banner (shown when guest attempts to report) -->
+    <div id="loginRequiredBanner" style="display:none;background:rgba(240,162,2,0.1);border:1px solid rgba(240,162,2,0.3);border-radius:8px;padding:16px 20px;margin-bottom:24px;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="var(--amber)" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <div>
+          <b style="color:var(--paper);font-size:14px;">Campus Member Authentication Required</b>
+          <div style="color:var(--muted);font-size:12px;">Please log in or register before submitting an infrastructure issue. Every report is tied to a verified student/faculty identity.</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn--amber" style="padding:6px 14px;font-size:12px;" onclick="openAuthModal('login')">Log In</button>
+        <button class="btn btn--outline" style="padding:6px 14px;font-size:12px;" onclick="openAuthModal('register')">Register New Account</button>
+      </div>
+    </div>
+
+    <!-- TAB 1: Report New Issue -->
+    <div id="tab-report" class="tab-pane is-active">
+      <div class="grid-2">
+        
+        <!-- Form Column -->
+        <div class="card" style="padding:28px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+            <h3 style="font-size:20px;margin:0;">1. Complaint Details</h3>
+            <span id="activeReporterChip" class="chip" style="font-size:10px;color:var(--cyan);border-color:rgba(79,209,197,0.4);">
+              Reporting as: Tejas Patil
+            </span>
+          </div>
+          
+          <form id="issueForm" onsubmit="handleIssueSubmit(event)">
+            <div class="form-group">
+              <label class="form-label">Issue Title</label>
+              <input type="text" id="issueTitle" class="form-input" placeholder="e.g. Water pipe leakage flooding 2nd floor corridor" required />
+            </div>
+
+            <div class="grid-2" style="gap:12px;">
+              <div class="form-group">
+                <label class="form-label">Campus Zone / Building</label>
+                <select id="issueZone" class="form-select" required>
+                  <option value="Academic Block A">Academic Block A</option>
+                  <option value="Academic Block B">Academic Block B</option>
+                  <option value="Science Block">Science Block</option>
+                  <option value="Central Library">Central Library</option>
+                  <option value="Main Cafeteria">Main Cafeteria</option>
+                  <option value="Central Courtyard">Central Courtyard</option>
+                  <option value="Engineering Workshop">Engineering Workshop</option>
+                  <option value="Student Hostels">Student Hostels</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Floor / Room Specifics</label>
+                <input type="text" id="issueRoom" class="form-input" placeholder="e.g. 3rd Floor, outside Lab 304" required />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Detailed Description</label>
+              <textarea id="issueDesc" class="form-textarea" rows="3" placeholder="Describe the physical condition, hazard level, or symptoms..." required></textarea>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Urgency Level</label>
+              <div style="display:flex;gap:12px;margin-top:6px;">
+                <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;">
+                  <input type="radio" name="urgency" value="Low" /> Low
+                </label>
+                <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;">
+                  <input type="radio" name="urgency" value="Medium" checked /> Medium
+                </label>
+                <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;">
+                  <input type="radio" name="urgency" value="High" /> High
+                </label>
+                <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;color:#ef4444;">
+                  <input type="radio" name="urgency" value="Critical" /> Critical
+                </label>
+              </div>
+            </div>
+
+            <!-- Photo Upload Area -->
+            <div class="form-group" style="margin-top:20px;">
+              <label class="form-label">Photographic Evidence (Required for AI Classification)</label>
+              
+              <div class="dropzone" id="dropzone" onclick="document.getElementById('photoInput').click()">
+                <svg class="dropzone__icon" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                <div class="dropzone__text">Click to browse or drop photograph here</div>
+                <div style="font-size:11px;color:var(--muted);margin-top:4px;">Supports JPG, PNG (Max 10MB)</div>
+              </div>
+              <input type="file" id="photoInput" accept="image/*" style="display:none;" onchange="handlePhotoSelect(event)" />
+
+              <!-- Quick Demo Samples -->
+              <div style="margin-top:14px;">
+                <div style="font-family:var(--font-mono);font-size:11px;color:var(--muted);margin-bottom:8px;">Load Demo Test Photos:</div>
+                <div style="display:flex;flex-wrap:wrap;gap:6px;">
+                  <button type="button" class="chip chip--pill" onclick="loadSamplePhoto('electrical')">⚡ Electrical</button>
+                  <button type="button" class="chip chip--pill" onclick="loadSamplePhoto('plumbing')">💧 Plumbing</button>
+                  <button type="button" class="chip chip--pill" onclick="loadSamplePhoto('structural')">🧱 Structural</button>
+                  <button type="button" class="chip chip--pill" onclick="loadSamplePhoto('cleanliness')">🧹 Cleanliness</button>
+                  <button type="button" class="chip chip--pill" onclick="loadSamplePhoto('equipment')">📽️ Equipment</button>
+                </div>
+              </div>
+
+              <!-- Selected Preview -->
+              <div id="previewContainer" class="preview-box" style="display:none;">
+                <img id="previewImg" src="" alt="Selected Preview" />
+                <div style="flex:1;">
+                  <div id="previewFilename" style="font-size:13px;font-weight:600;">image.jpg</div>
+                  <div id="previewFilesize" style="font-size:11px;color:var(--muted);">Ready for AI classification</div>
+                </div>
+                <button type="button" class="btn btn--ghost" style="padding:4px 8px;font-size:11px;" onclick="clearPhoto()">Remove</button>
+              </div>
+            </div>
+
+            <button type="submit" id="submitBtn" class="btn btn--amber btn--lg" style="width:100%;justify-content:center;margin-top:12px;">
+              <span>Submit Issue Report</span>
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </button>
+          </form>
+        </div>
+
+        <!-- AI Real-time Classification Column -->
+        <div class="card card--cyan" style="padding:28px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+            <h3 style="font-size:20px;color:var(--paper);">2. AI CNN Classification</h3>
+            <span class="eyebrow eyebrow--cyan" style="margin-bottom:0;padding:3px 8px;font-size:10px;">Automated Triage</span>
+          </div>
+
+          <p style="font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:20px;">
+            As designed in Section 2 &amp; 6.4 of the research paper, our CNN image classification pipeline processes uploaded photographs to automatically predict the category and assign the proper department.
+          </p>
+
+          <div id="aiEmptyState" style="text-align:center;padding:48px 16px;border:1px dashed var(--line);border-radius:8px;">
+            <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="var(--muted)" stroke-width="1.5" style="margin-bottom:12px;"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+            <div style="font-size:14px;color:var(--muted);">Select or drop a photo to view real-time AI classification &amp; routing</div>
+          </div>
+
+          <div id="aiActiveState" style="display:none;">
+            <!-- Category Tag -->
+            <div style="background:var(--panel-2);border:1px solid var(--line);border-radius:8px;padding:16px;margin-bottom:16px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <span style="font-family:var(--font-mono);font-size:11px;color:var(--muted);">PREDICTED CLASS</span>
+                <span id="aiConfidenceBadge" style="font-family:var(--font-mono);font-size:12px;color:var(--cyan);font-weight:600;">94.2% Match</span>
+              </div>
+              <div id="aiCategoryName" style="font-family:var(--font-display);font-size:24px;font-weight:700;color:var(--paper);margin-top:6px;">
+                Electrical
+              </div>
+            </div>
+
+            <!-- Probability Bars -->
+            <div style="margin-bottom:20px;">
+              <div style="font-family:var(--font-mono);font-size:11px;color:var(--muted);margin-bottom:10px;text-transform:uppercase;">Class Confidence Distribution</div>
+              
+              <div style="display:flex;flex-direction:column;gap:8px;" id="probBars">
+                <!-- Dynamically populated -->
+              </div>
+            </div>
+
+            <!-- Routing Details -->
+            <div style="background:rgba(79, 209, 197, 0.05);border:1px solid rgba(79, 209, 197, 0.3);border-radius:8px;padding:16px;">
+              <div style="font-family:var(--font-mono);font-size:11px;color:var(--cyan);text-transform:uppercase;margin-bottom:6px;">Intelligent Task Assignment</div>
+              <div id="aiRoutingTeam" style="font-size:14px;font-weight:600;color:var(--paper);">Electrical Maintenance Squad</div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-top:6px;">
+                <span id="aiRoutingContact">Direct Ext: ext. 401</span>
+                <span id="aiRoutingSla">Resolution Target: 4 Hours</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- TAB 2: Live Issue Tracking -->
+    <div id="tab-track" class="tab-pane">
+      <div class="panel-box" style="margin-bottom:24px;padding:20px;">
+        <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:space-between;">
+          <div style="display:flex;gap:10px;flex:1;max-width:380px;">
+            <input type="text" id="trackSearch" class="form-input" placeholder="Search by Ticket ID (e.g. SEN-2026-1042) or Title..." oninput="renderTrackingIssues()" />
+          </div>
+
+          <!-- Scope toggle: My Issues vs All Campus -->
+          <div style="display:flex;align-items:center;gap:8px;">
+            <button id="scopeMyIssuesBtn" class="btn btn--amber" style="padding:6px 12px;font-size:12px;" onclick="toggleIssueScope('my')">My Issues Only</button>
+            <button id="scopeAllIssuesBtn" class="btn btn--ghost" style="padding:6px 12px;font-size:12px;" onclick="toggleIssueScope('all')">All Campus Issues</button>
+          </div>
+
+          <!-- Status Filters -->
+          <div style="display:flex;gap:6px;overflow-x:auto;">
+            <button class="chip chip--pill is-active-filter" onclick="filterStatus('All', this)">All</button>
+            <button class="chip chip--pill" onclick="filterStatus('Reported', this)">Reported</button>
+            <button class="chip chip--pill" onclick="filterStatus('In Progress', this)">In Progress</button>
+            <button class="chip chip--pill" onclick="filterStatus('Resolved', this)">Resolved</button>
+            <button class="chip chip--pill" onclick="filterStatus('Closed', this)">Closed</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="issuesList" style="display:flex;flex-direction:column;gap:16px;">
+        <!-- Issues rendered dynamically -->
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ========================================== -->
+  <!-- CAMPUS MEMBER AUTHENTICATION MODAL         -->
+  <!-- ========================================== -->
+  <div id="authModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.8);z-index:2500;align-items:center;justify-content:center;padding:20px;">
+    <div class="card" style="width:100%;max-width:460px;background:var(--panel);box-shadow:0 16px 48px rgba(0,0,0,0.9);border:1px solid var(--line);">
+      
+      <!-- Modal Header -->
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span class="brand__icon">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/></svg>
+          </span>
+          <span style="font-family:var(--font-display);font-size:18px;font-weight:700;">Campus Member Access</span>
+        </div>
+        <button class="btn btn--ghost" style="padding:4px 8px;font-size:12px;" onclick="closeAuthModal()">✕</button>
+      </div>
+
+      <!-- Auth Tabs: Login vs Register -->
+      <div style="display:flex;border-bottom:1px solid var(--line);margin-bottom:20px;">
+        <button id="authTabLoginBtn" class="tab-btn is-active" style="flex:1;justify-content:center;" onclick="switchAuthTab('login')">Sign In</button>
+        <button id="authTabRegisterBtn" class="tab-btn" style="flex:1;justify-content:center;" onclick="switchAuthTab('register')">Register New Member</button>
+      </div>
+
+      <!-- Error message container -->
+      <div id="authModalError" style="display:none;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);color:#ef4444;padding:10px 14px;border-radius:6px;font-size:12px;margin-bottom:16px;"></div>
+
+      <!-- 1. LOGIN FORM -->
+      <form id="campusLoginForm" onsubmit="submitCampusLogin(event)">
+        <div class="form-group">
+          <label class="form-label">College Email ID</label>
+          <input type="email" id="loginEmail" class="form-input" placeholder="e.g. tejas@campus.edu" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input type="password" id="loginPassword" class="form-input" placeholder="Enter your password" required />
+        </div>
+
+        <button type="submit" id="loginSubmitBtn" class="btn btn--amber" style="width:100%;justify-content:center;margin-top:12px;padding:11px;">
+          <span>Sign In to Portal</span>
+        </button>
+
+        <!-- Quick Demo Switcher -->
+        <div style="margin-top:16px;border-top:1px solid var(--line);padding-top:14px;">
+          <div style="font-family:var(--font-mono);font-size:10px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">Quick Login as Student:</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <button type="button" class="chip chip--pill" onclick="quickFillLogin('tejas@campus.edu', 'student123')">Tejas</button>
+            <button type="button" class="chip chip--pill" onclick="quickFillLogin('devesh@campus.edu', 'student123')">Devesh</button>
+            <button type="button" class="chip chip--pill" onclick="quickFillLogin('shubham@campus.edu', 'student123')">Shubham</button>
+            <button type="button" class="chip chip--pill" onclick="quickFillLogin('manali@campus.edu', 'student123')">Manali</button>
+          </div>
+        </div>
+      </form>
+
+      <!-- 2. REGISTER FORM -->
+      <form id="campusRegisterForm" style="display:none;" onsubmit="submitCampusRegister(event)">
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input type="text" id="regName" class="form-input" placeholder="e.g. Pooja Sharma" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label">College Email ID</label>
+          <input type="email" id="regEmail" class="form-input" placeholder="e.g. pooja@campus.edu" required />
+        </div>
+        <div class="grid-2" style="gap:10px;">
+          <div class="form-group">
+            <label class="form-label">Department / Branch</label>
+            <select id="regDept" class="form-select" required>
+              <option value="Computer Science &amp; Business Systems">CS &amp; Business Systems (CSBS)</option>
+              <option value="Computer Engineering">Computer Engineering</option>
+              <option value="Information Technology">Information Technology</option>
+              <option value="Electronics &amp; Telecom">Electronics &amp; Telecom (E&amp;TC)</option>
+              <option value="Mechanical Engineering">Mechanical Engineering</option>
+              <option value="Civil Engineering">Civil Engineering</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Roll / Student ID</label>
+            <input type="text" id="regStudentId" class="form-input" placeholder="e.g. JSPM-CSBS-099" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Create Password</label>
+          <input type="password" id="regPassword" class="form-input" placeholder="Min 4 characters" minlength="4" required />
+        </div>
+
+        <button type="submit" id="regSubmitBtn" class="btn btn--cyan" style="width:100%;justify-content:center;margin-top:12px;padding:11px;background:var(--cyan);color:var(--ink);font-weight:600;">
+          <span>Register Account &amp; Sign In</span>
+        </button>
+      </form>
+
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      initCampusAuth();
+      loadIssues();
+    });
+  </script>
+</body>
+</html>
